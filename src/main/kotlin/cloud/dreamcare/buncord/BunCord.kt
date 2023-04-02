@@ -1,7 +1,9 @@
 package cloud.dreamcare.buncord
 
+import cloud.dreamcare.buncord.manager.ReactiveEventManagerFactory
 import io.github.cdimascio.dotenv.dotenv
 import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 import org.springframework.boot.Banner
@@ -10,13 +12,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class BunCordApplication : CommandLineRunner {
+class BunCord(val reactiveEventManagerFactory: ReactiveEventManagerFactory) : CommandLineRunner {
     override fun run(vararg args: String?) {
         val dotenv = dotenv {
             ignoreIfMissing = true
         }
 
-        val gatewayIntents = listOf(
+        val intents = listOf(
             GatewayIntent.GUILD_MEMBERS,
             GatewayIntent.GUILD_MESSAGE_REACTIONS,
             GatewayIntent.GUILD_MESSAGES,
@@ -26,15 +28,16 @@ class BunCordApplication : CommandLineRunner {
             GatewayIntent.MESSAGE_CONTENT
         )
 
-        JDABuilder.create(gatewayIntents)
-            .setToken(dotenv.get("DISCORD_TOKEN"))
+        JDABuilder.create(dotenv.get("DISCORD_TOKEN"), intents)
             .disableCache(CacheFlag.EMOJI, CacheFlag.STICKER, CacheFlag.SCHEDULED_EVENTS)
+            .setStatus(OnlineStatus.DO_NOT_DISTURB)
+            .setEventManager(reactiveEventManagerFactory.create(this.javaClass.packageName))
             .build()
     }
 }
 
 fun main(args: Array<String>) {
-    runApplication<BunCordApplication>(*args) {
+    runApplication<BunCord>(*args) {
         setBannerMode(Banner.Mode.OFF)
     }
 }
