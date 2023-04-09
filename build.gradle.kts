@@ -1,50 +1,50 @@
 plugins {
     application
-    id("org.springframework.boot") version "3.0.5"
+    kotlin("jvm") version "1.8.20"
     id("com.palantir.git-version") version "3.0.0"
-    kotlin("jvm") version "1.8.10"
-    kotlin("plugin.spring") version "1.8.10"
 }
-apply(plugin = "io.spring.dependency-management")
+
+application {
+    mainClass.set("cloud.dreamcare.buncord.BunCordKt")
+}
+
+kotlin {
+    jvmToolchain(17)
+}
 
 val gitVersion: groovy.lang.Closure<String> by extra
 version = gitVersion()
 
-configurations {
-    compileOnly {
-        extendsFrom(configurations.annotationProcessor.get())
-    }
-}
-
 repositories {
     mavenCentral()
-    maven("https://jitpack.io")
 }
 
 dependencies {
-    // Spring
-    implementation("org.springframework.boot:spring-boot-starter")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-
-    // Kotlin
-    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
-
-    // Developer Tools
-    annotationProcessor("org.projectlombok:lombok")
-    compileOnly("org.projectlombok:lombok")
-
     // Discord
-    implementation("net.dv8tion:JDA:5.0.0-beta.6")
-    implementation("com.github.minndevelopment:jda-reactor:1.6.0")
+    implementation("dev.kord:kord-core:0.8.3")
+
+    // Logging
+    implementation("io.github.oshai", "kotlin-logging-jvm", "4.0.0-beta-28")
+    implementation("ch.qos.logback", "logback-classic", "1.4.6")
+
+    // Tools
+    implementation("io.github.cdimascio", "dotenv-kotlin", "6.4.1")
+    implementation("org.reflections", "reflections", "0.10.2")
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
+tasks {
+    val fatJar = register<Jar>("fatJar") {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        dependsOn.addAll(listOf("compileJava", "compileKotlin", "processResources"))
+        archiveClassifier.set("standalone")
+
+        manifest { attributes(mapOf("Main-Class" to application.mainClass)) }
+        from(sourceSets.main.get().output)
+        from({
+            configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+        })
     }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
+    build {
+        dependsOn(fatJar)
+    }
 }
