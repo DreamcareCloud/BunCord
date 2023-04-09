@@ -22,8 +22,8 @@ Hi! This is an attempt to (re)write and make a public FOSS bot in Kotlin.
   - [ ] Server (un)boost notifications
   - [ ] ChatGPT
   - [ ] MusicBot
+  - [ ] Ticket support
   - [ ] ...
-- [ ] Ticket support
-- 
+
 ### Special Thanks
 - Project: [DiscordKT](https://github.com/DiscordKt/DiscordKt/tree/main)
