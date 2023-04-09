@@ -1,43 +1,86 @@
 package cloud.dreamcare.buncord
 
-import cloud.dreamcare.buncord.manager.ReactiveEventManagerFactory
+import cloud.dreamcare.buncord.internal.service.InjectionService
+import cloud.dreamcare.buncord.internal.utils.ReflectionUtils
+import cloud.dreamcare.buncord.listeners.Test
+import dev.kord.common.entity.PresenceStatus
+import dev.kord.core.Kord
+import dev.kord.gateway.Intent
+import dev.kord.gateway.Intents
+import dev.kord.gateway.PrivilegedIntent
+import dev.kord.rest.builder.interaction.group
+import dev.kord.rest.builder.interaction.integer
 import io.github.cdimascio.dotenv.dotenv
-import net.dv8tion.jda.api.JDABuilder
-import net.dv8tion.jda.api.OnlineStatus
-import net.dv8tion.jda.api.requests.GatewayIntent
-import net.dv8tion.jda.api.utils.cache.CacheFlag
-import org.springframework.boot.Banner
-import org.springframework.boot.CommandLineRunner
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.runApplication
+import io.github.oshai.KLogging
 
-@SpringBootApplication
-class BunCord(val reactiveEventManagerFactory: ReactiveEventManagerFactory) : CommandLineRunner {
-    override fun run(vararg args: String?) {
-        val dotenv = dotenv {
-            ignoreIfMissing = true
+public lateinit var kord: Kord
+internal val diService: InjectionService = InjectionService()
+
+internal class BunCord {
+    private companion object : KLogging()
+
+    internal suspend fun run(token: String) {
+        kord = Kord(token)
+
+        Test().testA()
+        Test().testB()
+
+        ReflectionUtils().registerFunctions("cloud.dreamcare.buncord.listeners", kord)
+        ReflectionUtils().registerFunctions("cloud.dreamcare.buncord.commands", kord)
+
+        kord.createGlobalChatInputCommand(
+            "sum",
+            "A slash command that sums two numbers",
+        ) {
+            group("moduke", "Sdf") {
+                subCommand("abc", "sdfdsf") {
+                }
+                subCommand("efg", "sdfdsf") {
+                    integer("first_number", "The first operand") {
+                        required = true
+                    }
+                    integer("second_number", "The second operand") {
+                        required = true
+                    }
+                }
+            }
+            group("sdfdsf", "Sdf") {
+                subCommand("abc", "sdfdsf") {
+                    integer("first_number", "The first operand") {
+                        required = true
+                    }
+                    integer("second_number", "The second operand") {
+                        required = true
+                    }
+                }
+                subCommand("efg", "sdfdsf") {
+                    integer("first_number", "The first operand") {
+                        required = true
+                    }
+                    integer("second_number", "The second operand") {
+                        required = true
+                    }
+                }
+            }
         }
 
-        val intents = listOf(
-            GatewayIntent.GUILD_MEMBERS,
-            GatewayIntent.GUILD_MESSAGE_REACTIONS,
-            GatewayIntent.GUILD_MESSAGES,
-            GatewayIntent.GUILD_MODERATION,
-            GatewayIntent.GUILD_PRESENCES,
-            GatewayIntent.GUILD_VOICE_STATES,
-            GatewayIntent.MESSAGE_CONTENT
-        )
-
-        JDABuilder.create(dotenv.get("DISCORD_TOKEN"), intents)
-            .disableCache(CacheFlag.EMOJI, CacheFlag.STICKER, CacheFlag.SCHEDULED_EVENTS)
-            .setStatus(OnlineStatus.DO_NOT_DISTURB)
-            .setEventManager(reactiveEventManagerFactory.create(this.javaClass.packageName))
-            .build()
+        kord.login {
+            name = "BunCord"
+            presence { status = PresenceStatus.DoNotDisturb }
+            @OptIn(PrivilegedIntent::class)
+            intents = Intents(
+                Intent.Guilds,
+                Intent.GuildMembers,
+                Intent.GuildMessages,
+                Intent.GuildMessageReactions,
+                Intent.MessageContent,
+            )
+        }
     }
 }
 
-fun main(args: Array<String>) {
-    runApplication<BunCord>(*args) {
-        setBannerMode(Banner.Mode.OFF)
-    }
+public suspend fun main(args: Array<String>) {
+    val environment = dotenv { ignoreIfMissing = true }
+
+    BunCord().run(args.getOrElse(0) { environment["DISCORD_TOKEN"] })
 }
