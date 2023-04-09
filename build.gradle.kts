@@ -10,6 +10,7 @@ application {
 
 kotlin {
     jvmToolchain(17)
+    explicitApi()
 }
 
 val gitVersion: groovy.lang.Closure<String> by extra
