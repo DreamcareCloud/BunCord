@@ -1,6 +1,6 @@
 name: Kotlin CI
 
-on: [ push, pull_request ]
+on: [ push ]
 
 jobs:
   build:
@@ -17,12 +17,17 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: --stacktrace --info build
-      - uses: softprops/action-gh-release@v1
-#          if: github.ref_name == 'main'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: JRE test
+        uses: actions/upload-artifact@v3
         with:
-          name: Release ${{ steps.tag_version.outputs.new_tag }}
-          tag_name: ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
-          files: build/libs/*-standalone.jar
+          name: standalone
+          path: build/libs/*-standalone.jar
+#      - uses: softprops/action-gh-release@v1
+##          if: github.ref_name == 'main'
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          name: Release ${{ steps.tag_version.outputs.new_tag }}
+#          tag_name: ${{ steps.tag_version.outputs.new_tag }}
+#          body: ${{ steps.tag_version.outputs.changelog }}
+#          files: build/libs/*-standalone.jar
