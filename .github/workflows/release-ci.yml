@@ -1,0 +1,33 @@
+name: Kotlin CI
+
+on: [ push ]
+
+jobs:
+  build:
+    name: Build BunCord
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: 'gradle'
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: --stacktrace --info build
+      - name: JRE test
+        uses: actions/upload-artifact@v3
+        with:
+          name: standalone
+          path: build/libs/*-standalone.jar
+#      - uses: softprops/action-gh-release@v1
+##          if: github.ref_name == 'main'
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          name: Release ${{ steps.tag_version.outputs.new_tag }}
+#          tag_name: ${{ steps.tag_version.outputs.new_tag }}
+#          body: ${{ steps.tag_version.outputs.changelog }}
+#          files: build/libs/*-standalone.jar
