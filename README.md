@@ -5,8 +5,8 @@ Hi! This is an attempt to (re)write and make a public FOSS bot in Kotlin.
 ### TODO
 - [x] Basic support for events
 - [x] Basic support for commands
-- [ ] Support for subcommands and groups
-- [ ] Class loader for events/commands (and possible other near-future implementations)
+- [x] Support for subcommands and groups
+- [x] Class loader for events/commands (and possible other near-future implementations)
 - [ ] Solution to persist data (file based JSON and/or Database support)
 - [ ] Docker support
 - [ ] Github actions

@@ -27,13 +27,13 @@ kotlin {
                 languageVersion = "2.0"
             }
         }
-        named("jvmMain") {
+        getByName("jvmMain") {
             dependencies {
                 // DotEnv loader
                 implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
                 implementation("ch.qos.logback:logback-classic:1.4.6")
 
-                implementation("dev.kord:kord-core:0.8.3")
+                implementation("dev.kord:kord-core:0.9.0")
                 implementation("io.github.oshai:kotlin-logging-jvm:4.0.0-beta-28")
                 implementation("org.reflections:reflections:0.10.2")
             }
