@@ -1,4 +1,4 @@
-package cloud.dreamcare.buncord.config
+package cloud.dreamcare.bunkord.config
 
 public data class User(
     public val id: Long,

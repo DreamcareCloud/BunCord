@@ -1,19 +1,17 @@
-package cloud.dreamcare.buncord
+package cloud.dreamcare.bunkord
 
-import cloud.dreamcare.buncord.annotations.Service
-import cloud.dreamcare.buncord.config.Configuration
-import cloud.dreamcare.buncord.dsl.globalCommands
-import cloud.dreamcare.buncord.internal.services.InjectionService
-import cloud.dreamcare.buncord.internal.util.ReflectionUtils
+import cloud.dreamcare.bunkord.annotations.Service
+import cloud.dreamcare.bunkord.config.Configuration
+import cloud.dreamcare.bunkord.dsl.globalCommands
+import cloud.dreamcare.bunkord.internal.services.InjectionService
+import cloud.dreamcare.bunkord.internal.util.ReflectionUtils
+import cloud.dreamcare.bunkord.internal.util.simplerName
 import dev.kord.common.entity.PresenceStatus
 import dev.kord.core.Kord
 import dev.kord.core.behavior.requestMembers
 import dev.kord.core.entity.application.GlobalApplicationCommand
 import dev.kord.core.event.Event
-import dev.kord.core.event.gateway.ConnectEvent
-import dev.kord.core.event.gateway.GatewayEvent
 import dev.kord.core.event.gateway.ReadyEvent
-import dev.kord.core.event.gateway.ResumedEvent
 import dev.kord.core.event.guild.GuildCreateEvent
 import dev.kord.core.on
 import dev.kord.gateway.*
@@ -28,7 +26,7 @@ import kotlin.time.DurationUnit
 internal val injectionService: InjectionService = InjectionService()
 public lateinit var configuration: Configuration
 
-public class BunCord {
+public class BunKord {
     private val logger: KLogger = KotlinLogging.logger { }
 
     @OptIn(PrivilegedIntent::class)
@@ -82,10 +80,26 @@ public class BunCord {
             configuration.guild(guild.id).apply {
                 name = guild.name
 
+                guild.roles.collect { role ->
+                    getRole(role.id).apply {
+                        name = role.name
+                        position = role.getPosition()
+                    }
+                }
+
                 guild.requestMembers().collect {
                     it.members.forEach { member ->
                         member(member.id).apply {
                             displayName = member.displayName
+                            active = true
+                            joinedAt = member.joinedAt
+
+                            member.roles.collect { role ->
+                                getRole(role.id).apply {
+                                    name = role.name
+                                    position = role.getPosition()
+                                }
+                            }
 
                             getUser().apply {
                                 username = member.username
@@ -100,13 +114,11 @@ public class BunCord {
         }
 
         kord.on<Event> {
-            logger.debug { this }
+            logger.debug { "Event: ${this::class.simplerName}" }
         }
 
-        logger.info { "sdf" }
-
         kord.login {
-            name = "BunCord"
+            name = "BunKord"
             presence { status = PresenceStatus.DoNotDisturb }
             @OptIn(PrivilegedIntent::class)
             intents = Intents(
@@ -126,7 +138,7 @@ public suspend fun main(args: Array<String>) {
 
     configuration = Configuration().load(Path(environment["CONFIG_PATH"]))
 
-    BunCord().run(
+    BunKord().run(
         token = args.getOrElse(0) { environment["DISCORD_TOKEN"] },
     )
 }

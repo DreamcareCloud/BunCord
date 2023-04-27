@@ -1,8 +1,8 @@
-package cloud.dreamcare.buncord.internal.util
+package cloud.dreamcare.bunkord.internal.util
 
-import cloud.dreamcare.buncord.injectionService
-import cloud.dreamcare.buncord.dsl.Command
-import cloud.dreamcare.buncord.dsl.Listener
+import cloud.dreamcare.bunkord.injectionService
+import cloud.dreamcare.bunkord.dsl.Command
+import cloud.dreamcare.bunkord.dsl.Listener
 import dev.kord.core.Kord
 import org.reflections.Reflections
 import org.reflections.scanners.Scanners

@@ -1,6 +1,6 @@
-package cloud.dreamcare.buncord.dsl
+package cloud.dreamcare.bunkord.dsl
 
-import cloud.dreamcare.buncord.internal.util.BuilderRegister
+import cloud.dreamcare.bunkord.internal.util.BuilderRegister
 import dev.kord.core.Kord
 import dev.kord.rest.builder.interaction.*
 

@@ -5,7 +5,7 @@ plugins {
 }
 
 application {
-    mainClass.set("cloud.dreamcare.buncord.BunCordKt")
+    mainClass.set("cloud.dreamcare.bunkord.BunKordKt")
 }
 
 val gitVersion: groovy.lang.Closure<String> by extra
@@ -34,6 +34,7 @@ kotlin {
                 implementation("ch.qos.logback:logback-classic:1.4.7")
                 implementation("org.reflections:reflections:0.10.2")
                 implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.8.8")
+                implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.5")
             }
         }
     }

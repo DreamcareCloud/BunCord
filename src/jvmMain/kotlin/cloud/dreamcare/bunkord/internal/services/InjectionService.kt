@@ -1,7 +1,7 @@
-package cloud.dreamcare.buncord.internal.services
+package cloud.dreamcare.bunkord.internal.services
 
-import cloud.dreamcare.buncord.internal.util.signature
-import cloud.dreamcare.buncord.internal.util.simplerName
+import cloud.dreamcare.bunkord.internal.util.signature
+import cloud.dreamcare.bunkord.internal.util.simplerName
 import mu.KLogger
 import mu.KotlinLogging
 import java.lang.reflect.Method
