@@ -24,8 +24,9 @@ internal class ReflectionUtils(path: String) {
 
     private inline fun <reified T : BuilderRegister> register(kord: Kord) = reflections
         .get(Scanners.MethodsReturn.with(T::class.java).`as`(Method::class.java))
+        .filter { !it.declaringClass.packageName.contains("dsl") }
         .forEach {
-            runCatching { injectionService.invokeMethod<T>(it).register(kord) }
+            injectionService.invokeMethod<T>(it).register(kord)
         }
 
     inline fun <reified T : Annotation> detectClassesWith(): Set<Class<*>> = reflections.get(
@@ -36,7 +37,6 @@ internal class ReflectionUtils(path: String) {
 internal val Class<*>.simplerName
     get() = toString().substringAfterLast('.').substringBefore('$')
 
-@PublishedApi
 internal val KClass<*>.simplerName: String
     get() = java.simplerName
 
