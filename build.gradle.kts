@@ -22,11 +22,6 @@ kotlin {
         withJava()
     }
     sourceSets {
-        all {
-            languageSettings {
-                languageVersion = "2.0"
-            }
-        }
         getByName("jvmMain") {
             dependencies {
                 implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
@@ -34,7 +29,6 @@ kotlin {
                 implementation("ch.qos.logback:logback-classic:1.4.7")
                 implementation("org.reflections:reflections:0.10.2")
                 implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.8.8")
-                implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.5")
             }
         }
     }

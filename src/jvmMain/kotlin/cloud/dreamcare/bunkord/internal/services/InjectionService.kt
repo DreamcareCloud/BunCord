@@ -37,8 +37,10 @@ public class InjectionService {
     }
 
     public fun buildAllRecursively(services: Set<Class<*>>, last: Int = -1) {
+        logger.info { "Registering ${services.size} Services" }
         val failed = services.mapNotNull {
             try {
+                logger.debug { "register<Service>(${it.name}" }
                 val result = invokeConstructor(it)
                 inject(result)
                 null

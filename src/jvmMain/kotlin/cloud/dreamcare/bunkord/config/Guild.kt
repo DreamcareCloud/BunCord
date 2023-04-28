@@ -1,6 +1,5 @@
 package cloud.dreamcare.bunkord.config
 
-import cloud.dreamcare.bunkord.configuration
 import dev.kord.common.entity.Snowflake
 
 public data class Guild(

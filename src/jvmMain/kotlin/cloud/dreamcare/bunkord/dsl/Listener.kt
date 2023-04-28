@@ -1,5 +1,6 @@
 package cloud.dreamcare.bunkord.dsl
 
+import cloud.dreamcare.bunkord.config.Configuration
 import cloud.dreamcare.bunkord.internal.util.BuilderRegister
 import dev.kord.core.Kord
 import dev.kord.core.entity.interaction.GroupCommand
@@ -13,7 +14,7 @@ import kotlinx.coroutines.Job
 
 public fun listener(construct: ListenerBuilder.() -> Unit): Listener = Listener(construct)
 
-public class ListenerBuilder(public val kord: Kord) {
+public class ListenerBuilder(public val kord: Kord, public val configuration: Configuration) {
     public inline fun <reified T: Event> on(noinline consumer: suspend T.() -> Unit): Job = kord.on<T>(kord, consumer)
 
     public inline fun <reified T: ChatInputCommandInteractionCreateEvent> onCommand(name: String, noinline listener: suspend T.() -> Unit): Job = kord.on<T> { if (interaction.command.isTriggered(name)) { listener(this) } }
@@ -30,7 +31,7 @@ public fun InteractionCommand.isTriggered(name: String): Boolean {
         return false
     }
 
-    return this.rootName == name;
+    return this.rootName == name
 }
 
 public fun InteractionCommand.isTriggered(name: String, subCommand: String): Boolean {
@@ -38,7 +39,7 @@ public fun InteractionCommand.isTriggered(name: String, subCommand: String): Boo
         return false
     }
 
-    return this.rootName == name && this.name == subCommand;
+    return this.rootName == name && this.name == subCommand
 }
 
 public fun InteractionCommand.isTriggered(name: String, group: String, subCommand: String): Boolean {
@@ -46,11 +47,11 @@ public fun InteractionCommand.isTriggered(name: String, group: String, subComman
         return false
     }
 
-    return this.rootName == name && this.groupName == group && this.name == subCommand;
+    return this.rootName == name && this.groupName == group && this.name == subCommand
 }
 
 public class Listener(private val collector: ListenerBuilder.() -> Unit): BuilderRegister {
-    override fun register(kord: Kord) {
-        collector.invoke(ListenerBuilder(kord))
+    override fun register(kord: Kord, configuration: Configuration) {
+        collector.invoke(ListenerBuilder(kord, configuration))
     }
 }

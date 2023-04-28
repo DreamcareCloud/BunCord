@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import dev.kord.common.entity.Snowflake
@@ -14,14 +13,12 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import java.io.File
 import java.nio.file.Path
-import kotlin.io.path.createDirectory
-import kotlin.io.path.exists
 
 private lateinit var configPath: File
+internal lateinit var configuration: Configuration
 private val objectMapper = jacksonObjectMapper().apply {
     setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
     configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-    registerModule(JavaTimeModule())
     SimpleModule().run {
         addSerializer(Instant::class.java, InstantSerializer())
         addDeserializer(Instant::class.java, InstantDeserializer())
@@ -41,16 +38,14 @@ public data class Configuration(
     }
 
     public fun load(path: Path): Configuration {
-        if (!path.exists()) {
-            path.createDirectory()
-        }
-
         configPath = File("${path}/config.json")
         if (!configPath.exists()) {
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(configPath, this)
         }
 
-        return objectMapper.readValue<Configuration>(File("${path}/config.json"))
+        return objectMapper.readValue<Configuration>(File("${path}/config.json")).also {
+            configuration = it
+        }
     }
 
     public fun guild(id: Snowflake): Guild {

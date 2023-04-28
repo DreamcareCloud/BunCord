@@ -5,39 +5,37 @@ import cloud.dreamcare.bunkord.config.Configuration
 import cloud.dreamcare.bunkord.dsl.globalCommands
 import cloud.dreamcare.bunkord.internal.services.InjectionService
 import cloud.dreamcare.bunkord.internal.util.ReflectionUtils
-import cloud.dreamcare.bunkord.internal.util.simplerName
 import dev.kord.common.entity.PresenceStatus
 import dev.kord.core.Kord
-import dev.kord.core.behavior.requestMembers
 import dev.kord.core.entity.application.GlobalApplicationCommand
-import dev.kord.core.event.Event
 import dev.kord.core.event.gateway.ReadyEvent
-import dev.kord.core.event.guild.GuildCreateEvent
 import dev.kord.core.on
-import dev.kord.gateway.*
+import dev.kord.gateway.Intent
+import dev.kord.gateway.Intents
+import dev.kord.gateway.PrivilegedIntent
 import io.github.cdimascio.dotenv.dotenv
-import kotlinx.coroutines.*
+import kotlinx.coroutines.launch
 import mu.KLogger
 import mu.KotlinLogging
 import kotlin.concurrent.timer
 import kotlin.io.path.Path
-import kotlin.time.DurationUnit
+import kotlin.io.path.createDirectories
 
 internal val injectionService: InjectionService = InjectionService()
-public lateinit var configuration: Configuration
+private val logger: KLogger = KotlinLogging.logger { }
 
 public class BunKord {
-    private val logger: KLogger = KotlinLogging.logger { }
-
-    @OptIn(PrivilegedIntent::class)
-    public suspend fun run(token: String) {
+    public suspend fun run(token: String, configuration: Configuration) {
         val kord = Kord(token)
 
+        logger.info { "Starting BunKord" }
+
         injectionService.inject(this)
+        injectionService.inject(configuration)
 
         ReflectionUtils(this::class.java.packageName).apply {
             detectClassesWith<Service>().apply { injectionService.buildAllRecursively(this) }
-            registerFunctions(kord)
+            registerFunctions(kord, configuration)
         }
 
         kord.getGlobalApplicationCommands().collect { command: GlobalApplicationCommand ->
@@ -53,20 +51,16 @@ public class BunKord {
             commands.addAll(globalCommands.commands)
         }
 
+        var counter = 0
         kord.on<ReadyEvent> {
             logger.info {
-                "${self.tag} <@${self.id}> logged in (${guildIds.size} guilds)! (${
-                    gateway.ping.value!!.toString(
-                        DurationUnit.MILLISECONDS
-                    )
-                })"
+                "${self.tag} <@${self.id}> logged in! (${gateway.ping.value})"
             }
             kord.editPresence {
                 status = PresenceStatus.Online
                 watching("${guildIds.size} guild(s)")
             }
 
-            var counter = 0
             timer("test", true, 0L, 60000L) {
                 kord.launch {
                     kord.editPresence {
@@ -74,47 +68,6 @@ public class BunKord {
                     }
                 }
             }
-        }
-
-        kord.on<GuildCreateEvent> {
-            configuration.guild(guild.id).apply {
-                name = guild.name
-
-                guild.roles.collect { role ->
-                    getRole(role.id).apply {
-                        name = role.name
-                        position = role.getPosition()
-                    }
-                }
-
-                guild.requestMembers().collect {
-                    it.members.forEach { member ->
-                        member(member.id).apply {
-                            displayName = member.displayName
-                            active = true
-                            joinedAt = member.joinedAt
-
-                            member.roles.collect { role ->
-                                getRole(role.id).apply {
-                                    name = role.name
-                                    position = role.getPosition()
-                                }
-                            }
-
-                            getUser().apply {
-                                username = member.username
-                                discriminator = member.discriminator
-                            }
-                        }
-                    }
-                }
-            }.also {
-                configuration.save()
-            }
-        }
-
-        kord.on<Event> {
-            logger.debug { "Event: ${this::class.simplerName}" }
         }
 
         kord.login {
@@ -132,13 +85,11 @@ public class BunKord {
     }
 }
 
-
 public suspend fun main(args: Array<String>) {
     val environment = dotenv { ignoreIfMissing = true }
 
-    configuration = Configuration().load(Path(environment["CONFIG_PATH"]))
-
     BunKord().run(
         token = args.getOrElse(0) { environment["DISCORD_TOKEN"] },
+        configuration = Path(environment["CONFIG_PATH"]).createDirectories().toRealPath().run { Configuration().load(this) }
     )
 }

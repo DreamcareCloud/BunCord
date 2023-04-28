@@ -1,6 +1,5 @@
 package cloud.dreamcare.bunkord.config
 
-import cloud.dreamcare.bunkord.configuration
 import com.fasterxml.jackson.annotation.JsonIgnore
 import dev.kord.common.entity.Snowflake
 import kotlinx.datetime.Instant

@@ -12,7 +12,7 @@
     </appender>
 
     <logger name="org.reflections.Reflections" level="WARN" />
-    <logger name="cloud.dreamcare.bunkord" level="DEBUG" />
+    <logger name="cloud.dreamcare.bunkord" level="INFO" />
 
     <root level="info">
         <appender-ref ref="STDOUT" />

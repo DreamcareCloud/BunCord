@@ -1,6 +1,5 @@
 package cloud.dreamcare.bunkord.commands
 
-import cloud.dreamcare.bunkord.configuration
 import cloud.dreamcare.bunkord.dsl.Command
 import cloud.dreamcare.bunkord.dsl.Listener
 import cloud.dreamcare.bunkord.dsl.createGlobalChatInputCommand
