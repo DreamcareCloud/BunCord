@@ -65,6 +65,7 @@ public class BunKord {
                 kord.launch {
                     kord.editPresence {
                         watching("test ${++counter}")
+                        logger.info { "boop counter is set to $counter" }
                     }
                 }
             }
@@ -90,6 +91,7 @@ public suspend fun main(args: Array<String>) {
 
     BunKord().run(
         token = args.getOrElse(0) { environment["DISCORD_TOKEN"] },
-        configuration = Path(environment["CONFIG_PATH"]).createDirectories().toRealPath().run { Configuration().load(this) }
+        configuration = Path(environment["CONFIG_PATH"]).createDirectories().toRealPath()
+            .run { Configuration().load(this) }
     )
 }

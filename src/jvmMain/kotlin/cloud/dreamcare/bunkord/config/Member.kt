@@ -5,12 +5,12 @@ import dev.kord.common.entity.Snowflake
 import kotlinx.datetime.Instant
 
 public data class Member(
-    public val id: Long,
+    public val id: Snowflake,
     public var active: Boolean = true,
     public var displayName: String? = null,
     public var joinedAt: Instant? = null,
     public var leftAt: Instant? = null,
-    public val roles: MutableMap<Long, Role> = mutableMapOf(),
+    public val roles: MutableMap<Snowflake, Role> = mutableMapOf(),
 ) {
     @JsonIgnore
     public fun getUser(): User {
@@ -18,10 +18,6 @@ public data class Member(
     }
 
     public fun getRole(id: Snowflake): Role {
-        return getRole(id.value.toLong())
-    }
-
-    public fun getRole(id: Long): Role {
         return roles.getOrPut(id) { Role(id) }
     }
 

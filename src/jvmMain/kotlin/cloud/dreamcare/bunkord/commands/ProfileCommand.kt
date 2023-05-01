@@ -7,7 +7,6 @@ import cloud.dreamcare.bunkord.dsl.listener
 import cloud.dreamcare.bunkord.value.EmojiValue
 import dev.kord.common.DiscordTimestampStyle
 import dev.kord.common.entity.Permission
-import dev.kord.common.entity.Snowflake
 import dev.kord.common.toMessageFormat
 import dev.kord.core.behavior.interaction.response.respond
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
@@ -37,17 +36,22 @@ public class ProfileCommand {
                     title = "${member.displayName}'s profile"
                     color = member.accentColor
                     thumbnail {
-                        url = (member.memberAvatar ?: member.avatar)?.cdnUrl?.toUrl() ?: member.defaultAvatar.cdnUrl.toUrl {
-                            format = Image.Format.PNG
-                        }
+                        url = (member.memberAvatar ?: member.avatar)?.cdnUrl?.toUrl()
+                            ?: member.defaultAvatar.cdnUrl.toUrl {
+                                format = Image.Format.PNG
+                            }
                     }
 
                     field {
                         inline = true
                         name = "Rank"
-                        value = interaction.guild.getRole(Snowflake(memberEntity.getHighestPositionedRole().id)).mention
-                        if (member.isOwner()) { value += " ${EmojiValue.CROWN.emoji}" }
-                        if (member.isBot) { value += " ${EmojiValue.BOT.emoji}" }
+                        value = interaction.guild.getRole(memberEntity.getHighestPositionedRole().id).mention
+                        if (member.isOwner()) {
+                            value += " ${EmojiValue.CROWN.emoji}"
+                        }
+                        if (member.isBot) {
+                            value += " ${EmojiValue.BOT.emoji}"
+                        }
                     }
                     field {
                         inline = true
@@ -76,7 +80,7 @@ public class ProfileCommand {
                         name = "Roles"
                         value = memberEntity.roles.values.toList()
                             .sortedByDescending { it.position }
-                            .map { interaction.guild.getRole(Snowflake(it.id)) }
+                            .map { interaction.guild.getRole(it.id) }
                             .joinToString(" ") { it.mention }
                     }
                 }
