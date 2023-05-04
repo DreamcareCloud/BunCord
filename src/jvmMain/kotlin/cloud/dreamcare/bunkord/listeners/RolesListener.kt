@@ -8,16 +8,15 @@ import cloud.dreamcare.bunkord.entity.Emoji
 import cloud.dreamcare.bunkord.extensions.getSelectedOption
 import cloud.dreamcare.bunkord.extensions.isAvailableEmoji
 import cloud.dreamcare.bunkord.extensions.publish
+import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.interaction.response.respond
 import dev.kord.core.behavior.interaction.suggestString
 import dev.kord.core.event.guild.GuildCreateEvent
 import dev.kord.core.event.interaction.GuildAutoCompleteInteractionCreateEvent
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
-import dev.kord.core.event.message.MessageBulkDeleteEvent
-import dev.kord.core.event.message.MessageDeleteEvent
-import dev.kord.core.event.message.ReactionAddEvent
-import dev.kord.core.event.message.ReactionRemoveEvent
+import dev.kord.core.event.message.*
+import dev.kord.core.exception.EntityNotFoundException
 
 public class RolesListener {
     public fun menu(): Listener = listener {
@@ -43,15 +42,31 @@ public class RolesListener {
                 title = command.strings["title"]
                 description = command.strings["description"]
             }.run {
-                publish(interaction.getGuild())
+                try {
+                    publish(interaction.getGuild())
+                    configuration.guild(interaction.guildId).roleMenus[messageId!!] = menu
+
+                } catch (_: EntityNotFoundException) {
+                    configuration.guild(interaction.guildId).roleMenus.remove(messageId!!)
+                }
             }.also {
-                response.delete()
+                configuration.save()
             }
+
+            response.delete()
         }
 
         on<GuildCreateEvent> {
-            configuration.guild(guild.id).roleMenus.forEach { (_, menu) ->
-                menu.publish(guild)
+            val menus = configuration.guild(guild.id).roleMenus
+
+            menus.toSortedMap().forEach { (messageId, menu) ->
+                try {
+                    menu.publish(guild)
+                } catch (_: EntityNotFoundException) {
+                    menus.remove(messageId).also {
+                        configuration.save()
+                    }
+                }
             }
         }
 
@@ -109,13 +124,32 @@ public class RolesListener {
             }.run {
                 menu.publish(interaction.getGuild())
             }.also {
+                configuration.save()
                 response.delete()
+            }
+        }
+
+        // remove the option permanently when the last one is removed
+        on<ReactionRemoveEvent> {
+            if (null == guildId) { return@on }
+            if (null == userAsMember) { return@on }
+            if (false == userAsMember?.asMember()?.getPermissions()?.contains(Permission.ManageMessages)) { return@on }
+            val menu = configuration.guild(guildId!!).roleMenus[messageId] ?: return@on
+            if (message.fetchMessage().reactions.any { it.emoji == emoji }) {  return@on }
+
+            menu.apply {
+                options.remove(Emoji.from(emoji.mention).markdown)
+            }.run {
+                menu.publish(guild!!.asGuild())
+            }.also {
+                configuration.save()
             }
         }
     }
 
     public fun reactions(): Listener = listener {
         on<ReactionAddEvent> {
+            if (userId == kord.selfId) { return@on }
             if (null == guildId) { return@on }
             if (null == userAsMember) { return@on }
 
@@ -125,6 +159,7 @@ public class RolesListener {
         }
 
         on<ReactionRemoveEvent> {
+            if (userId == kord.selfId) { return@on }
             if (null == guildId) { return@on }
             if (null == userAsMember) { return@on }
 

@@ -1,6 +1,5 @@
 package cloud.dreamcare.bunkord.extensions
 
-import cloud.dreamcare.bunkord.config.configuration
 import cloud.dreamcare.bunkord.config.role.RoleMenu
 import cloud.dreamcare.bunkord.config.role.RoleOption
 import dev.kord.core.behavior.channel.asChannelOf
@@ -9,16 +8,16 @@ import dev.kord.core.behavior.edit
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.ReactionEmoji
 import dev.kord.core.entity.channel.MessageChannel
+import dev.kord.core.exception.EntityNotFoundException
 import dev.kord.rest.builder.message.EmbedBuilder
 
+@Throws(EntityNotFoundException::class)
 public suspend fun RoleMenu.publish(guild: Guild) {
     val channel = guild.getChannel(channelId).asChannelOf<MessageChannel>()
 
     when (messageId) {
         null -> { channel.createMessage { embeds.add(toEmbedBuilder()) }.apply { messageId = id } }
         else -> { channel.getMessage(messageId!!).edit { embeds = mutableListOf(toEmbedBuilder()) } }
-    }.also {
-        configuration.save()
     }.run {
         if (reactions.map { reaction -> reaction.emoji } == toReactionEmojis()) {
             return
