@@ -1,7 +1,8 @@
 package cloud.dreamcare.bunkord.config
 
-import cloud.dreamcare.bunkord.entity.Emoji
-import cloud.dreamcare.bunkord.serializers.*
+import cloud.dreamcare.bunkord.extensions.emojiSerializer
+import cloud.dreamcare.bunkord.extensions.instantSerializer
+import cloud.dreamcare.bunkord.extensions.snowflakeSerializer
 import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -19,14 +20,12 @@ internal lateinit var configuration: Configuration
 private val objectMapper = jacksonObjectMapper().apply {
     setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
     configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-    SimpleModule().run {
-        addSerializer(Instant::class.java, InstantSerializer())
-        addDeserializer(Instant::class.java, InstantDeserializer())
-        addSerializer(Emoji::class.java, EmojiSerializer())
-        addDeserializer(Emoji::class.java, EmojiDeserializer())
-        addSerializer(Snowflake::class.java, SnowflakeSerializer())
-        addDeserializer(Snowflake::class.java, SnowflakeDeserializer())
-        registerModule(this)
+    SimpleModule().apply {
+        emojiSerializer()
+        instantSerializer()
+        snowflakeSerializer()
+    }.also {
+        registerModule(it)
     }
 }
 

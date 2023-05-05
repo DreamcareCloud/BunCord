@@ -2,12 +2,16 @@ package cloud.dreamcare.bunkord.commands
 
 import cloud.dreamcare.bunkord.dsl.Command
 import cloud.dreamcare.bunkord.dsl.createGlobalChatInputCommand
+import dev.kord.common.entity.Permission
+import dev.kord.common.entity.Permissions
 import dev.kord.rest.builder.interaction.group
 import dev.kord.rest.builder.interaction.role
 import dev.kord.rest.builder.interaction.string
 
 public class SetupCommand {
     public fun register(): Command = createGlobalChatInputCommand("setup", "Bot Setup") {
+        defaultMemberPermissions = Permissions { Permission.Administrator }
+        dmPermission = false
         group("roles", "configure roles") {
             subCommand("menu", "Add/Edit menu") {
                 string("menu", "Menu") { required = true; autocomplete = true }
