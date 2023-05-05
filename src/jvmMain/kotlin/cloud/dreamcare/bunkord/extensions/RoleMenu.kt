@@ -1,7 +1,7 @@
 package cloud.dreamcare.bunkord.extensions
 
 import cloud.dreamcare.bunkord.config.role.RoleMenu
-import cloud.dreamcare.bunkord.config.role.RoleOption
+import cloud.dreamcare.bunkord.config.role.RoleReaction
 import dev.kord.core.behavior.channel.asChannelOf
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.edit
@@ -29,7 +29,7 @@ public suspend fun RoleMenu.publish(guild: Guild) {
     }
 }
 
-public fun RoleMenu.getSelectedOption(emoji: ReactionEmoji): RoleOption? {
+public fun RoleMenu.getSelectedOption(emoji: ReactionEmoji): RoleReaction? {
     return options.map { it.value }.find { it.emoji.toReactionEmoji() == emoji }
 }
 

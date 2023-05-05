@@ -1,7 +1,7 @@
 package cloud.dreamcare.bunkord.listeners
 
 import cloud.dreamcare.bunkord.config.role.RoleMenu
-import cloud.dreamcare.bunkord.config.role.RoleOption
+import cloud.dreamcare.bunkord.config.role.RoleReaction
 import cloud.dreamcare.bunkord.dsl.Listener
 import cloud.dreamcare.bunkord.dsl.listener
 import cloud.dreamcare.bunkord.entity.Emoji
@@ -94,7 +94,7 @@ public class RolesListener {
     }
 
     public fun option(): Listener = listener {
-        onAutoComplete<GuildAutoCompleteInteractionCreateEvent>("setup", "roles", "option") {
+        onAutoComplete<GuildAutoCompleteInteractionCreateEvent>("setup", "roles", "reaction") {
             interaction.suggestString {
                 configuration.guild(interaction.guildId).roleMenus
                     .filter { it.value.title?.contains(interaction.focusedOption.value, true) != false }
@@ -102,7 +102,7 @@ public class RolesListener {
             }
         }
 
-        onCommand<GuildChatInputCommandInteractionCreateEvent>("setup", "roles", "option") {
+        onCommand<GuildChatInputCommandInteractionCreateEvent>("setup", "roles", "reaction") {
             val response = interaction.deferEphemeralResponse()
             val command = interaction.command
             val emoji = Emoji.from(command.strings["emoji"]!!)
@@ -116,7 +116,7 @@ public class RolesListener {
             }
 
             val menu = configuration.guild(interaction.guildId).roleMenus[Snowflake(command.strings["menu"]!!)]!!
-            val option = menu.options.getOrPut(emoji.markdown) { RoleOption(emoji) }
+            val option = menu.options.getOrPut(emoji.markdown) { RoleReaction(emoji) }
 
             option.apply {
                 role = configuration.guild(interaction.guildId).getRole(command.roles["role"]!!.id)

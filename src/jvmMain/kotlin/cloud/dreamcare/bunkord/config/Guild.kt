@@ -21,8 +21,4 @@ public data class Guild(
     public fun getRole(id: Snowflake): Role {
         return roles.getOrPut(id) { Role(id) }
     }
-
-    public fun removeRoleMenu(id: Snowflake) {
-        roleMenus.remove(id)
-    }
 }

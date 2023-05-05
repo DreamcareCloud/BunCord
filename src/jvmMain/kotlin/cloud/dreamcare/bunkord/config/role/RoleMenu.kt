@@ -7,5 +7,5 @@ public data class RoleMenu(
     public var messageId: Snowflake? = null,
     public var title: String? = null,
     public var description: String? = null,
-    public val options: MutableMap<String, RoleOption> = mutableMapOf()
+    public val options: MutableMap<String, RoleReaction> = mutableMapOf()
 )
