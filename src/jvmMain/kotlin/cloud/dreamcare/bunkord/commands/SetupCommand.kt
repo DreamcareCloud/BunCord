@@ -4,13 +4,11 @@ import cloud.dreamcare.bunkord.dsl.Command
 import cloud.dreamcare.bunkord.dsl.createGlobalChatInputCommand
 import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Permissions
-import dev.kord.rest.builder.interaction.group
-import dev.kord.rest.builder.interaction.role
-import dev.kord.rest.builder.interaction.string
+import dev.kord.rest.builder.interaction.*
 
 public class SetupCommand {
     public fun register(): Command = createGlobalChatInputCommand("setup", "Bot Setup") {
-        defaultMemberPermissions = Permissions { Permission.Administrator }
+        defaultMemberPermissions = Permissions { Permission.ManageGuild }
         dmPermission = false
         group("roles", "configure roles") {
             subCommand("menu", "Add/Edit menu") {
@@ -25,6 +23,12 @@ public class SetupCommand {
                 role("role", "The role to assign") { required = true }
                 string("description", "Description to display (default: roll name)")
             }
+        }
+
+        subCommand("greeter", "configure boost announcement") {
+            channel("channel", "Send greeting message to this channel") { required = true }
+            boolean("on-join", "Greet member when they join")
+            role("on-role", "Greet member when they get this role")
         }
     }
 }
