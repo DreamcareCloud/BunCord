@@ -29,6 +29,7 @@ public class GreeterListener {
                 channel = command.channels["channel"]?.id
                 onJoin = command.booleans["on-join"] ?: false
                 onRole = command.roles["on-role"]?.let { cloud.dreamcare.bunkord.config.Role(it.id, it.name, it.getPosition()) }
+                message = command.strings["message"] ?: ""
             }
 
             configuration.save()
@@ -72,7 +73,7 @@ public class GreeterListener {
             if (!greeter.onJoin) { return@on }
             val member = member.withStrategy(EntitySupplyStrategy.cachingRest).fetchMember(guildId)
 
-            greet(guild.getChannelOf<TextChannel>(greeter.channel!!), member)
+            greet(guild.getChannelOf<TextChannel>(greeter.channel!!), member, greeter)
         }
 
         on<MemberUpdateEvent> {
@@ -85,16 +86,17 @@ public class GreeterListener {
                 return@on
             }
 
-            greet(guild.getChannelOf<TextChannel>(greeter.channel!!), member)
+            greet(guild.getChannelOf<TextChannel>(greeter.channel!!), member, greeter)
         }
     }
 
-    private suspend fun greet(channel: TextChannel, member: Member) {
+    private suspend fun greet(channel: TextChannel, member: Member, config: Greeter) {
         channel.createMessage {
             content = "Welcome to the **${member.getGuild().name}** server, ${member.mention}!"
 
             embed {
                 title = "Welcome ${member.displayName}!"
+                description = config.message
 
                 color = member.accentColor
                 thumbnail {

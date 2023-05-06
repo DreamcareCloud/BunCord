@@ -29,6 +29,7 @@ public class SetupCommand {
             channel("channel", "Send greeting message to this channel") { required = true }
             boolean("on-join", "Greet member when they join")
             role("on-role", "Greet member when they get this role")
+            string("message", "The greeting message")
         }
     }
 }
