@@ -30,6 +30,8 @@ kotlin {
                 implementation("org.reflections:reflections:0.10.2")
                 implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.8.8")
                 implementation("io.github.seisuke:kemoji-jvm:0.2.0")
+
+                implementation("com.aallam.openai:openai-client:3.2.3")
             }
         }
     }

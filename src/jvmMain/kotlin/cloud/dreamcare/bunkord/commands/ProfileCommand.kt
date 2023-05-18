@@ -28,7 +28,7 @@ public class ProfileCommand {
             val response = interaction.deferPublicResponse()
             val command = interaction.command
             val member = command.users.getOrDefault("user", interaction.user)
-                .withStrategy(EntitySupplyStrategy.cachingRest).fetchMember(interaction.guildId)
+                .withStrategy(EntitySupplyStrategy.rest).fetchMember(interaction.guildId)
             val memberEntity = configuration.guild(interaction.guildId).member(member.id)
 
             response.respond {

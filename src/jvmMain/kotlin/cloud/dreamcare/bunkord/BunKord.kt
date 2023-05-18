@@ -5,6 +5,8 @@ import cloud.dreamcare.bunkord.config.Configuration
 import cloud.dreamcare.bunkord.dsl.globalCommands
 import cloud.dreamcare.bunkord.internal.services.InjectionService
 import cloud.dreamcare.bunkord.internal.util.ReflectionUtils
+import dev.kord.cache.map.MapLikeCollection
+import dev.kord.cache.map.internal.MapEntryCache
 import dev.kord.common.entity.PresenceStatus
 import dev.kord.core.Kord
 import dev.kord.core.entity.application.GlobalApplicationCommand
@@ -26,7 +28,13 @@ private val logger: KLogger = KotlinLogging.logger { }
 
 public class BunKord {
     public suspend fun run(token: String, configuration: Configuration) {
-        val kord = Kord(token)
+        val kord = Kord(token)  {
+            cache {
+                messages { cache, description ->
+                    MapEntryCache(cache, description, MapLikeCollection.concurrentHashMap())
+                }
+            }
+        }
 
         logger.info { "Starting BunKord" }
 

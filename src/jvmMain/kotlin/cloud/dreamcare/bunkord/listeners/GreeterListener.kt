@@ -71,7 +71,7 @@ public class GreeterListener {
             val greeter = configuration.guild(guildId).greeter ?: return@on
             if (null == greeter.channel) { return@on }
             if (!greeter.onJoin) { return@on }
-            val member = member.withStrategy(EntitySupplyStrategy.cachingRest).fetchMember(guildId)
+            val member = member.withStrategy(EntitySupplyStrategy.rest).fetchMember(guildId)
 
             greet(guild.getChannelOf<TextChannel>(greeter.channel!!), member, greeter)
         }
@@ -80,7 +80,7 @@ public class GreeterListener {
             if (null == old) { return@on }
             val greeter = configuration.guild(guildId).greeter ?: return@on
             if (null == greeter.channel) { return@on }
-            val member = member.withStrategy(EntitySupplyStrategy.cachingRest).fetchMember(guildId)
+            val member = member.withStrategy(EntitySupplyStrategy.rest).fetchMember(guildId)
 
             if (!member.roleIds.minus(old!!.roleIds).contains(greeter.onRole?.id)) {
                 return@on

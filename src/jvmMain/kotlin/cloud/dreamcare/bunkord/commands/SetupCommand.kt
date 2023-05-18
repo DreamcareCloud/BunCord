@@ -10,6 +10,25 @@ public class SetupCommand {
     public fun register(): Command = createGlobalChatInputCommand("setup", "Bot Setup") {
         defaultMemberPermissions = Permissions { Permission.ManageGuild }
         dmPermission = false
+
+        subCommand("greeter", "configure boost announcement") {
+            channel("channel", "Send greeting message to this channel") { required = true }
+            boolean("on-join", "Greet member when they join")
+            role("on-role", "Greet member when they get this role")
+            string("message", "The greeting message")
+        }
+
+        group("openai", "Configure OpenAI integration") {
+            subCommand("token", "configure the token") {
+                string("token", "token") { required = true }
+            }
+
+            subCommand("chatgpt", "ChatGPT settings") {
+                string("model", "ChatGPT model") { required = true; autocomplete = true }
+                string("personality", "The personality of the bot")
+            }
+        }
+
         group("roles", "configure roles") {
             subCommand("menu", "Add/Edit menu") {
                 string("menu", "Menu") { required = true; autocomplete = true }
@@ -23,13 +42,6 @@ public class SetupCommand {
                 role("role", "The role to assign") { required = true }
                 string("description", "Description to display (default: roll name)")
             }
-        }
-
-        subCommand("greeter", "configure boost announcement") {
-            channel("channel", "Send greeting message to this channel") { required = true }
-            boolean("on-join", "Greet member when they join")
-            role("on-role", "Greet member when they get this role")
-            string("message", "The greeting message")
         }
     }
 }
