@@ -25,7 +25,7 @@ kotlin {
         getByName("jvmMain") {
             dependencies {
                 implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
-                implementation("dev.kord:kord-core:0.9.0")
+                implementation("dev.kord:kord-core:0.10.0")
                 implementation("ch.qos.logback:logback-classic:1.4.8")
                 implementation("org.reflections:reflections:0.10.2")
                 implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
