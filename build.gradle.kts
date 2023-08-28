@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.8.21"
+    kotlin("multiplatform") version "1.9.10"
     id("com.palantir.git-version") version "3.0.0"
     application
 }
