@@ -31,7 +31,7 @@ kotlin {
                 implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
                 implementation("io.github.seisuke:kemoji-jvm:0.2.0")
 
-                implementation("com.aallam.openai:openai-client:3.3.1")
+                implementation("com.aallam.openai:openai-client:3.4.2")
             }
         }
     }
